@@ -36,6 +36,7 @@ def update_repo(repo_url)
     prefixed_puts "Updating #{dir_name}..."
 
     run "git", "-C", dir_name, "remote", "set-url", "origin", repo_url
+    run "git", "-C", dir_name, "remote", "set-head", "origin", "-a"
 
     default_branch =
       File.basename(

@@ -35,6 +35,8 @@ def update_repo(repo_url)
   if Dir.exist?(dir_name)
     prefixed_puts "Updating #{dir_name}..."
 
+    run "git", "-C", dir_name, "stash", "-u", "--quiet", "-m", "autostashed by mass_git_clone"
+
     run "git", "-C", dir_name, "remote", "set-url", "origin", repo_url
     run "git", "-C", dir_name, "remote", "set-head", "origin", "-a"
 

@@ -2,7 +2,6 @@
 
 require "fileutils"
 require "open3"
-require "set"
 require "parallel"
 
 def run(*args)

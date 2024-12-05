@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../lib/mass_git_clone'
-
+require_relative "../lib/mass_git_clone"
 
 if ARGV[0].nil? || ARGV.size > 1 || STDIN.tty?
   STDERR.puts "Usage `mass_git_clone <repo_base_directory>`. Pass newline-separated repo list via STDIN."

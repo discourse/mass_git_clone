@@ -3,3 +3,6 @@ inherit_gem:
 
 Discourse/NoChdir:
   Enabled: false
+
+Discourse/Plugins/NamespaceMethods:
+  Enabled: false

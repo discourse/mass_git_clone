@@ -79,13 +79,14 @@ module MassGitClone
       all_entries.map do |entry|
         repo, dir_name = entry.split(" ")
 
-        repo_url = if !repo.match?(%r{\A[\w-]+/[\w-]+\z})
-          repo # Full URL, leave untouched
-        elsif use_ssh
-          "git@github.com:#{repo}"
-        else
-          "https://github.com/#{repo}"
-        end
+        repo_url =
+          if !repo.match?(%r{\A[\w-]+/[\w-]+\z})
+            repo # Full URL, leave untouched
+          elsif use_ssh
+            "git@github.com:#{repo}"
+          else
+            "https://github.com/#{repo}"
+          end
 
         dir_name ||= File.basename(repo_url, ".git")
 

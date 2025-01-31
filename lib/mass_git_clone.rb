@@ -29,8 +29,7 @@ end
 # Clone or update a repo with the given URL
 # On failure, return the repo url
 # On success, return nil
-def update_repo(repo_url)
-  dir_name = File.basename(repo_url, ".git")
+def update_repo(repo_url, dir_name)
   if Dir.exist?(dir_name)
     prefixed_puts "Updating #{dir_name}..."
 
@@ -70,21 +69,28 @@ module MassGitClone
         false
       end
 
-    all_repos = repo_list.map(&:strip).filter { |l| l.length > 0 }
-    if all_repos.size === 0
-      prefixed_puts "No plugin URLs supplied"
+    all_entries = repo_list.map(&:strip).filter { |l| l.length > 0 }
+    if all_entries.size === 0
+      prefixed_puts "No git repository URLs supplied"
       exit 1
     end
 
-    all_repos =
-      all_repos.map do |repo|
-        if !repo.match?(%r{\A[\w-]+/[\w-]+\z})
-          repo # Full URL, leave untouched
-        elsif use_ssh
-          "git@github.com:#{repo}"
-        else
-          "https://github.com/#{repo}"
-        end
+    all_entries =
+      all_entries.map do |entry|
+        repo, dir_name = entry.split(" ")
+
+        repo_url =
+          if !repo.match?(%r{\A[\w-]+/[\w-]+\z})
+            repo # Full URL, leave untouched
+          elsif use_ssh
+            "git@github.com:#{repo}"
+          else
+            "https://github.com/#{repo}"
+          end
+
+        dir_name ||= File.basename(repo_url, ".git")
+
+        [repo_url, dir_name]
       end
 
     Dir.mkdir(repo_base_dir) if !Dir.exist?(repo_base_dir)
@@ -92,13 +98,13 @@ module MassGitClone
     Dir.chdir(repo_base_dir) do
       failures =
         Parallel
-          .map(all_repos, in_threads: ENV["PARALLEL"]&.to_i || 10) do |repo_url|
-            update_repo(repo_url)
+          .map(all_entries, in_threads: ENV["PARALLEL"]&.to_i || 10) do |repo_url, dir_name|
+            update_repo(repo_url, dir_name)
           end
           .reject(&:nil?)
 
       final_dirs = Dir.glob("*")
-      expected_dirs = Set.new(all_repos.map { |r| File.basename(r, ".git") })
+      expected_dirs = Set.new(all_entries.map { |_, dir_name| dir_name })
       to_delete = final_dirs.reject { |dir| expected_dirs.include?(dir) }
 
       if to_delete.any?

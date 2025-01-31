@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) if !$LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "mass_git_clone"
-  spec.version       = "0.2.0"
+  spec.version       = "0.3.0"
   spec.authors       = ["Discourse Team"]
 
   spec.summary       = %q{Tool for maintaining clones of a large number of git repositories}

@@ -36,16 +36,16 @@ def update_repo(repo_url, dir_name)
     run "git", "-C", dir_name, "stash", "-u", "--quiet", "-m", "autostashed by mass_git_clone"
 
     run "git", "-C", dir_name, "remote", "set-url", "origin", repo_url
-    run "git", "-C", dir_name, "remote", "set-head", "origin", "-a"
 
     default_branch =
-      File.basename(
-        run("git", "-C", dir_name, "symbolic-ref", "--short", "refs/remotes/origin/HEAD").strip
-      )
+      run("git", "-C", dir_name, "ls-remote", "--symref", "origin", "HEAD")[
+        %r{^ref: refs/heads/(.+)\tHEAD$},
+        1
+      ] || raise("Could not determine the default branch")
 
-    run "git", "-C", dir_name, "checkout", "-f", default_branch
     run "git", "-C", dir_name, "fetch", "origin", default_branch
-    run "git", "-C", dir_name, "reset", "--hard", "origin/#{default_branch}"
+    run "git", "-C", dir_name, "remote", "set-head", "origin", default_branch
+    run "git", "-C", dir_name, "checkout", "-f", "-B", default_branch, "origin/#{default_branch}"
     run "git", "-C", dir_name, "clean", "-f", "-d"
   else
     prefixed_puts "Cloning #{dir_name}..."
